@@ -3,7 +3,7 @@ package apiteamamerica
 import (
 	//"bytes"
 	"encoding/xml"
-	"fmt"
+	//"fmt"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
@@ -25,7 +25,7 @@ func (client *Taclient) Connect() (string, error) {
 }
 
 //ListCities returns a list with cities
-func (tac *Taclient) ListCities(r *http.Request) (string, error) {
+func (tac *Taclient) ListCities(r *http.Request) ([]byte, error) {
 
 	xparam := `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.wso2.org/php/xsd">
 	<soapenv:Header/>
@@ -43,19 +43,22 @@ func (tac *Taclient) ListCities(r *http.Request) (string, error) {
 	resp, err := client.Post(tac.URL, "text/xml", strings.NewReader(xparam))
 
 	if err != nil {
-		return "Eroare", err
+		return []byte("Error"), err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 
-	//testing decode xml
-	var envelope XmlEnvelope
-	// we unmarshal our byteArray which contains our
-	// xmlFiles content into 'users' which we defined above
-	xml.Unmarshal(body, &envelope)
+	/*
+		//testing decode xml
+		var envelope XmlEnvelope
+		// we unmarshal our byteArray which contains our
+		// xmlFiles content into 'users' which we defined above
+		xml.Unmarshal(body, &envelope)
 
-	//	return buf.String(), err
-	return fmt.Sprintln(envelope.Body), err
+		//	return buf.String(), err
+		return fmt.Sprintln(envelope.Body), err
+	*/
+	return body, err
 }
 
 /* XML Response for fault
