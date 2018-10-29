@@ -2,7 +2,8 @@ package apiteamamerica
 
 import (
 	//"bytes"
-	//"fmt"
+	"encoding/xml"
+	"fmt"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
@@ -24,7 +25,7 @@ func (client *Taclient) Connect() (string, error) {
 }
 
 //ListCities returns a list with cities
-func (tac *Taclient) ListCities(r *http.Request) ([]byte, error) {
+func (tac *Taclient) ListCities(r *http.Request) (string, error) {
 
 	xparam := `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.wso2.org/php/xsd">
 	<soapenv:Header/>
@@ -42,11 +43,41 @@ func (tac *Taclient) ListCities(r *http.Request) ([]byte, error) {
 	resp, err := client.Post(tac.URL, "text/xml", strings.NewReader(xparam))
 
 	if err != nil {
-		return []byte("Eroare"), err
+		return "Eroare", err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 
+	//testing decode xml
+	var envelope XmlEnvelope
+	// we unmarshal our byteArray which contains our
+	// xmlFiles content into 'users' which we defined above
+	xml.Unmarshal(body, &envelope)
+
 	//	return buf.String(), err
-	return body, err
+	return fmt.Sprintln(envelope.Body), err
+}
+
+/* XML Response for fault
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+	<soapenv:Body>
+		<soapenv:Fault>
+			<faultcode>soapenv:Server</faultcode>
+			<faultstring> Error - Login Invalid</faultstring>
+			<detail/>
+		</soapenv:Fault>
+	</soapenv:Body>
+</soapenv:Envelope>
+*/
+
+//Cities List strcut for decoding XML
+type XmlEnvelope struct {
+	XMLName xml.Name  `xml:"soapenv:Envelope"`
+	Body    []XmlBody `xml:"soapenv:Body"`
+}
+
+//type body
+type XmlBody struct {
+	XMLName xml.Name `xml:"soapenv:Body"`
+	content string
 }
