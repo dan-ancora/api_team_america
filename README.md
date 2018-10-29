@@ -1,1 +1,3 @@
-# api_team_america
+# Go Client for Teamamerica Hotels
+
+
