@@ -27,7 +27,8 @@ func (client *Taclient) Connect() (string, error) {
 //ListCities returns a list with cities
 func (tac *Taclient) ListCities(r *http.Request) ([]byte, error) {
 
-	xparam := `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.wso2.org/php/xsd">
+	xparam := `<?xml version='1.0' encoding='UTF-8'?>
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.wso2.org/php/xsd">
 	<soapenv:Header/>
 	<soapenv:Body>
 	   <xsd:ListCities>
