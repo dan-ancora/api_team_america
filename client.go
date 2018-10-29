@@ -41,7 +41,7 @@ func (tac *Taclient) ListCities(r *http.Request) ([]byte, error) {
 	ctx := appengine.NewContext(r)
 
 	client := urlfetch.Client(ctx)
-	resp, err := client.Post(tac.URL, "text/xml", strings.NewReader(xparam))
+	resp, err := client.Post(tac.URL, "text/xml; charset=utf-8", strings.NewReader(xparam))
 
 	if err != nil {
 		return []byte("Error"), err
@@ -50,6 +50,7 @@ func (tac *Taclient) ListCities(r *http.Request) ([]byte, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 
 	/*
+		//Adi, xxxx
 		//testing decode xml
 		var envelope XmlEnvelope
 		// we unmarshal our byteArray which contains our
