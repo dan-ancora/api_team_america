@@ -19,42 +19,46 @@ type Taclient struct {
 }
 
 //Connect is to start coonecting and returns
-func (client *Taclient) Connect() (string, error) {
+func (taClient *Taclient) Connect() (string, error) {
 
-	return client.URL, nil
+	return taClient.URL, nil
 }
 
 //ListCities returns a list with cities
-func (tac *Taclient) ListCities(r *http.Request) ([]byte, error) {
+func (taClient *Taclient) ListCities(r *http.Request) ([]byte, error) {
 
-	xparam := `<?xml version='1.0' encoding='UTF-8'?>
-	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.wso2.org/php/xsd">
+	xparam := `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.wso2.org/php/xsd">
 	<soapenv:Header/>
 	<soapenv:Body>
 	   <xsd:ListCities>
-		  <xsd:UserName>XMLSMAY</xsd:UserName>
-		  <xsd:Password>M3WgnuOV</xsd:Password>
+		  <xsd:UserName>test</xsd:UserName>
+		  <xsd:Password>12345</xsd:Password>
 	   </xsd:ListCities>
 	</soapenv:Body>
  </soapenv:Envelope>`
 
+	//must be a Google Api Engine Context
 	ctx := appengine.NewContext(r)
 
+	//get *http.Client from GAE urlfetch package
 	client := urlfetch.Client(ctx)
-	resp, err := client.Post(tac.URL, "text/xml; charset=utf-8", strings.NewReader(xparam))
+
+	//invoke a POST call with xparam
+	resp, err := client.Post(taClient.URL, "text/xml; charset=utf-8", strings.NewReader(xparam))
 
 	if err != nil {
 		return []byte("Error"), err
 	}
 
+	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 
 	/*
-		//Adi, xxxx
+
 		//testing decode xml
 		var envelope XmlEnvelope
-		// we unmarshal our byteArray which contains our
-		// xmlFiles content into 'users' which we defined above
+		// we unmarshal our byteArray which contains our specific data
 		xml.Unmarshal(body, &envelope)
 
 		//	return buf.String(), err
@@ -75,14 +79,14 @@ func (tac *Taclient) ListCities(r *http.Request) ([]byte, error) {
 </soapenv:Envelope>
 */
 
-//Cities List strcut for decoding XML
-type XmlEnvelope struct {
-	XMLName xml.Name  `xml:"soapenv:Envelope"`
-	Body    []XmlBody `xml:"soapenv:Body"`
+//XMLEnvelope is generic
+type XMLEnvelope struct {
+	XMLName xml.Name  `xml:"Envelope"`
+	Body    []XMLBody `xml:"Body"`
 }
 
-//type body
-type XmlBody struct {
-	XMLName xml.Name `xml:"soapenv:Body"`
+//XMLBody is generic
+type XMLBody struct {
+	XMLName xml.Name `xml:"Body"`
 	content string
 }
